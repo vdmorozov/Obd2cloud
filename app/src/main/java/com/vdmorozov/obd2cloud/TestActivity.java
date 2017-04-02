@@ -14,6 +14,9 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,10 +28,25 @@ public class TestActivity extends AppCompatActivity {
     ListView mListView;
     SimpleAdapter mPairedAdapter;
 
+    // Firebase instance variables
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseUser mFirebaseUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+
+        // Initialize Firebase Auth
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseUser = mFirebaseAuth.getCurrentUser();
+        if (mFirebaseUser == null) {
+            // Not signed in, launch the Sign In activity
+            startActivity(new Intent(this, SignInActivity.class));
+            finish();
+            return;
+        }
+
 
         mDeviceList = new ArrayList<>();
         mListView = (ListView) findViewById(R.id.pairedView);
@@ -112,6 +130,10 @@ public class TestActivity extends AppCompatActivity {
         super.onDestroy();
 
         // Don't forget to unregister the ACTION_FOUND receiver.
-        unregisterReceiver(mReceiver);
+        try {
+            unregisterReceiver(mReceiver);
+        } catch (IllegalArgumentException e){
+            //если получатель не был зарегистрирован, ничего не делаем (можно проверять с помощью переменной класса)
+        }
     }
 }
