@@ -7,4 +7,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="profile_image">profile image</string>
+    <string name="profile_default_name">Anonymous</string>
+    <string name="profile_default_mail">anonymous@example.com</string>
 </resources>
