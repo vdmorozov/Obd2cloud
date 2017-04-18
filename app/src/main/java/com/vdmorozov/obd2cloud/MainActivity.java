@@ -20,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Switch;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,7 +28,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -59,6 +60,28 @@ public class MainActivity extends AppCompatActivity
 
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if(v.getId() == R.id.syncSwitch) {
+            Switch s = (Switch) v;
+            if (!s.isEnabled()) {
+                return;
+            }
+
+            if (s.isChecked()) {
+                //todo: 1. диалог подключения
+                
+                Intent bt = new Intent(this, TestActivity.class);
+                startActivity(bt);
+
+                //todo: 2. запустить службу
+            } else {
+                //todo: остановить службу
+            }
         }
     }
 
@@ -96,6 +119,9 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        Switch syncSwitch = (Switch) navigationView.getHeaderView(0).findViewById(R.id.syncSwitch);
+        syncSwitch.setOnClickListener(this);
     }
 
     @Override

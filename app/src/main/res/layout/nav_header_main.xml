@@ -35,4 +35,12 @@
         android:layout_height="wrap_content"
         android:text="@string/profile_default_mail" />
 
+    <Switch
+        android:id="@+id/syncSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textOn="@string/sync_on"
+        android:textOff="@string/sync_off"
+        android:text="@string/sync" />
+
 </LinearLayout>

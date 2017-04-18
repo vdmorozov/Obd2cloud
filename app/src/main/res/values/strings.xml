@@ -10,4 +10,8 @@
     <string name="profile_image">profile image</string>
     <string name="profile_default_name">Anonymous</string>
     <string name="profile_default_mail">anonymous@example.com</string>
+
+    <string name="sync">Synchronization</string>
+    <string name="sync_on">Sync enabled</string>
+    <string name="sync_off">Sync disabled</string>
 </resources>
