@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -42,27 +43,22 @@ public class MainActivity extends AppCompatActivity
         }
 
         protected Bitmap doInBackground(Uri... photoUrls) {
-            Uri photoUrl = photoUrls[0];
-            Bitmap mIcon11 = null;
+            Bitmap mIcon = null;
             try {
-                InputStream in = new java.net.URL(
-                        "https://lh3.googleusercontent.com/-198VvqhnzFE/AAAAAAAAAAI/AAAAAAAAAAA/AMcAYi8nFm2kujWLjoDR-WRXZC-59CCX7Q/s96-c/photo.jpg"
-                ).openConnection().getInputStream();
-                if(in != null){
-                    mIcon11 = BitmapFactory.decodeStream(in);
+                InputStream in = new java.net.URL(photoUrls[0].toString()).openConnection().getInputStream();
+                if (in != null) {
+                    mIcon = BitmapFactory.decodeStream(in);
                 }
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
                 e.printStackTrace();
             }
-            return mIcon11;
+
+            return mIcon;
         }
 
         protected void onPostExecute(Bitmap result) {
-            if(result != null) {
-                Log.w("LOL", result.toString());
-                bmImage.setImageBitmap(result);
-            }
+            bmImage.setImageBitmap(result);
         }
     }
 
@@ -83,15 +79,16 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        //установка аватара
         Uri profileImageUrl = mFirebaseUser.getPhotoUrl();
 
-        //todo: приходит null - найти способ дёрнуть нужную ImageView
-        ImageView profileImageView = (ImageView) findViewById(R.id.profileImage);
+        ImageView profileImageView = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.profileImage);
+        (new DownloadImageTask(profileImageView)).execute(profileImageUrl);
 
-        if (profileImageUrl != null) {
-            new DownloadImageTask(profileImageView)
-                    .execute(profileImageUrl);
-        }
+        //todo: установка имени / почты
 
         //добавление кнопки для вызова бокового меню в хэдере
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -99,9 +96,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -127,7 +121,7 @@ public class MainActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+//        int id = item.getItemId();
 
 //        //noinspection SimplifiableIfStatement
 //        if (id == R.id.action_settings) {
@@ -139,7 +133,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
