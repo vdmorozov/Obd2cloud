@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity
     private FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
 
+    //todo: изучить безопасную работу с AsyncTask при изменении ориентации экрана
     private class DownloadImageTask extends AsyncTask<Uri, Void, Bitmap> {
         ImageView bmImage;
 

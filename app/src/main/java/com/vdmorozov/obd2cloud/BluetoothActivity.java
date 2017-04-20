@@ -17,15 +17,18 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class BluetoothActivity extends AppCompatActivity {
-
-    //TODO: соединение по клику
-    //TODO: обработчик ActivityResult для сканирования после включения bluetooth
 
     //todo: indicating search
     //todo: search restart
@@ -37,6 +40,7 @@ public class BluetoothActivity extends AppCompatActivity {
     ListView mListView;
     SimpleAdapter mPairedAdapter;
     private BluetoothAdapter btAdapter;
+    public static final int RC_ENABLE_BT = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +58,12 @@ public class BluetoothActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
 
-        final BluetoothActivity c = this;
-
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //todo: 1. соединиться с выбранным устройством
 
                 String address = mDeviceList.get(position).get("address");
-                Toast.makeText(c, address, Toast.LENGTH_SHORT).show();
+                btConnect(address);
 
                 //todo: 2. запустить службу для обмена данными в случае успешного соединения
             }
@@ -73,6 +74,18 @@ public class BluetoothActivity extends AppCompatActivity {
 
     private void btConnect(String address){
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
+        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+        try {
+            BluetoothSocket socket = device.createInsecureRfcommSocketToServiceRecord(uuid);
+            socket.connect();
+
+            String connected = socket.isConnected() ? "true" : "false";
+            Toast.makeText(this, connected, Toast.LENGTH_LONG).show();
+
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -99,8 +112,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
         if (!btAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            int REQUEST_ENABLE_BT = 1;
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            startActivityForResult(enableBtIntent, RC_ENABLE_BT);
             return;
         }
 
@@ -149,6 +161,20 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         }
     };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_ENABLE_BT) {
+            if(btAdapter.isEnabled()){
+                showBluetoothDevices(mListView);
+            } else {
+                finish();
+                Toast.makeText(this, R.string.bt_need_to_enable, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onDestroy() {

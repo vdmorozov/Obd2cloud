@@ -16,4 +16,5 @@
     <string name="sync_off">Sync disabled</string>
 
     <string name="bt_devices">Bluetooth devices</string>
+    <string name="bt_need_to_enable">Bluetooth needs to be enabled</string>
 </resources>
