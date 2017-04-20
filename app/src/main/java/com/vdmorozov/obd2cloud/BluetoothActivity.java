@@ -9,10 +9,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 public class BluetoothActivity extends AppCompatActivity {
+
+    //TODO: соединение по клику
+    //TODO: обработчик ActivityResult для сканирования после включения bluetooth
 
     //todo: indicating search
     //todo: search restart
@@ -30,13 +36,14 @@ public class BluetoothActivity extends AppCompatActivity {
     List<HashMap<String, String>> mDeviceList;
     ListView mListView;
     SimpleAdapter mPairedAdapter;
+    private BluetoothAdapter btAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar =  getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(R.string.bt_devices);
 
@@ -47,7 +54,25 @@ public class BluetoothActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
 
+        final BluetoothActivity c = this;
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //todo: 1. соединиться с выбранным устройством
+
+                String address = mDeviceList.get(position).get("address");
+                Toast.makeText(c, address, Toast.LENGTH_SHORT).show();
+
+                //todo: 2. запустить службу для обмена данными в случае успешного соединения
+            }
+        });
+
         showBluetoothDevices(mListView);
+    }
+
+    private void btConnect(String address){
+        BluetoothDevice device = btAdapter.getRemoteDevice(address);
     }
 
     @Override
@@ -65,14 +90,14 @@ public class BluetoothActivity extends AppCompatActivity {
     public void showBluetoothDevices(View view) {
 
         //BT init
-        BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        if (bluetooth == null) {
+        if (btAdapter == null) {
             Snackbar.make(view, "no bluetooth support", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             return;
         }
 
-        if (!bluetooth.isEnabled()) {
+        if (!btAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             int REQUEST_ENABLE_BT = 1;
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
@@ -82,7 +107,7 @@ public class BluetoothActivity extends AppCompatActivity {
         //Snackbar.make(view, "Yippee-ki-yay, motherfucker! " + bluetooth.getName(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
         //show paired devices
-        Set<BluetoothDevice> pairedDevices = bluetooth.getBondedDevices();
+        Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
 
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
@@ -103,7 +128,7 @@ public class BluetoothActivity extends AppCompatActivity {
         mListView.setAdapter(mPairedAdapter);
 
         //search for BT devices
-        bluetooth.startDiscovery();
+        btAdapter.startDiscovery();
     }
 
     // Create a BroadcastReceiver for ACTION_FOUND.
