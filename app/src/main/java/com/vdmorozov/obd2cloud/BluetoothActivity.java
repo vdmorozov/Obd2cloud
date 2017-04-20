@@ -6,24 +6,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.Toast;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class TestActivity extends AppCompatActivity {
+public class BluetoothActivity extends AppCompatActivity {
+
+    //todo: indicating search
+    //todo: search restart
+    //todo: separate paired and found devices
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -34,9 +34,11 @@ public class TestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_test);
+        setContentView(R.layout.activity_bluetooth);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(R.string.bt_devices);
 
         mDeviceList = new ArrayList<>();
         mListView = (ListView) findViewById(R.id.pairedView);
@@ -44,6 +46,8 @@ public class TestActivity extends AppCompatActivity {
         // Register for broadcasts when a device is discovered.
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
+
+        showBluetoothDevices(mListView);
     }
 
     @Override
@@ -58,10 +62,9 @@ public class TestActivity extends AppCompatActivity {
         }
     }
 
-    //СВАЛКА
+    public void showBluetoothDevices(View view) {
 
-    public void onBluetoothClick(View view) {
-
+        //BT init
         BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
 
         if (bluetooth == null) {
@@ -76,8 +79,9 @@ public class TestActivity extends AppCompatActivity {
             return;
         }
 
-        Snackbar.make(view, "Yippee-ki-yay, motherfucker! " + bluetooth.getName(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
+        //Snackbar.make(view, "Yippee-ki-yay, motherfucker! " + bluetooth.getName(), Snackbar.LENGTH_LONG).setAction("Action", null).show();
 
+        //show paired devices
         Set<BluetoothDevice> pairedDevices = bluetooth.getBondedDevices();
 
         if (pairedDevices.size() > 0) {
@@ -98,14 +102,8 @@ public class TestActivity extends AppCompatActivity {
         );
         mListView.setAdapter(mPairedAdapter);
 
-        String res;
-        res = bluetooth.startDiscovery() ? "true" : "false";
-
-        Log.i("BLUETOOTH_DISCOVERY", res);
-
-        if(bluetooth.isDiscovering()){
-            Toast.makeText(this, "discovering...", Toast.LENGTH_LONG).show();
-        }
+        //search for BT devices
+        bluetooth.startDiscovery();
     }
 
     // Create a BroadcastReceiver for ACTION_FOUND.

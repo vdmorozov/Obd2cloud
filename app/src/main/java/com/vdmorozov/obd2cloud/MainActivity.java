@@ -7,8 +7,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -75,7 +73,7 @@ public class MainActivity extends AppCompatActivity
             if (s.isChecked()) {
                 //todo: 1. диалог подключения
                 
-                Intent bt = new Intent(this, TestActivity.class);
+                Intent bt = new Intent(this, BluetoothActivity.class);
                 startActivity(bt);
 
                 //todo: 2. запустить службу

@@ -25,6 +25,10 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class SignInActivity extends AppCompatActivity
         implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
+    //todo: индикация (при плохом соединении неясно, что происходит)
+    //todo: авторизация/регистрация обычным способом
+    //todo: авторизация через facebook/twitter/etc
+
     private static final String TAG = SignInActivity.class.getSimpleName();
 
     private static final int RC_GOOGLE_SIGN_IN = 1;
