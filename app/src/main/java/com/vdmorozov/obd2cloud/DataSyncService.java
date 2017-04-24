@@ -1,22 +1,45 @@
 package com.vdmorozov.obd2cloud;
 
-import android.app.IntentService;
+import android.app.Service;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.util.Log;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 
-public class DataSyncService extends IntentService {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-    public DataSyncService() {
-        super(DataSyncService.class.getSimpleName());
-    }
+public class DataSyncService extends Service {
 
+    private BluetoothSocket btSocket;
+    private Set<Param> availibleParams;
+
+    @Nullable
     @Override
-    protected void onHandleIntent(Intent startIntent) {
-
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
-    private void getDataPortion(){
+    private ParamValue fetchValue(Param param){
 
+        Integer value = null;
+        int code = param.getCode();
+
+        //todo: запрос к устройству через btSocket по коду code
+
+        return new ParamValue(value);
     }
 
+    private Snapshot fetchSnapshot(){
+        Map<Param, ParamValue> fetched = new HashMap<>();
+        for(Param param : availibleParams){
+            fetched.put(param, fetchValue(param));
+        }
+        return new Snapshot(fetched);
+    }
+
+    private void sendSnapshot(Snapshot snapshot){
+        //todo: отправка снимка в Firebase
+    }
 }
