@@ -1,5 +1,6 @@
 package com.vdmorozov.obd2cloud;
 
+import android.app.Notification;
 import android.app.Service;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
@@ -15,13 +16,22 @@ public class DataSyncService extends Service {
     private BluetoothSocket btSocket;
     private Set<Param> availibleParams;
 
+    public void onCreate() {
+        super.onCreate();
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_menu_camera)
+                .setContentText("TEST")
+                .build();
+        startForeground(1488, notification);
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
-    private ParamValue fetchValue(Param param){
+    private ParamValue fetchValue(Param param) {
 
         Integer value = null;
         int code = param.getCode();
@@ -31,15 +41,15 @@ public class DataSyncService extends Service {
         return new ParamValue(value);
     }
 
-    private Snapshot fetchSnapshot(){
+    private Snapshot fetchSnapshot() {
         Map<Param, ParamValue> fetched = new HashMap<>();
-        for(Param param : availibleParams){
+        for (Param param : availibleParams) {
             fetched.put(param, fetchValue(param));
         }
         return new Snapshot(fetched);
     }
 
-    private void sendSnapshot(Snapshot snapshot){
+    private void sendSnapshot(Snapshot snapshot) {
         //todo: отправка снимка в Firebase
     }
 }
