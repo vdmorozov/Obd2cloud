@@ -58,14 +58,18 @@ public class BluetoothActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter);
 
+        final Context context = this;
+
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 String address = mDeviceList.get(position).get("address");
-                btConnect(address);
+                //btConnect(address);
 
                 //todo: 2. запустить службу для обмена данными в случае успешного соединения
+
+                startService(new Intent(context, DataSyncService.class));
             }
         });
 

@@ -27,6 +27,8 @@
             android:name=".BluetoothActivity" />
         <activity
             android:name=".SignInActivity" />
+        <service
+            android:name=".DataSyncService"/>
     </application>
 
 </manifest>
