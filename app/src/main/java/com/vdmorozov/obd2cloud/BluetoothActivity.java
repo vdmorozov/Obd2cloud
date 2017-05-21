@@ -69,27 +69,11 @@ public class BluetoothActivity extends AppCompatActivity {
 
                 //todo: 2. запустить службу для обмена данными в случае успешного соединения
 
-                startService(new Intent(context, DataSyncService.class));
+                startService(new Intent(context, DataSyncService.class).putExtra("btDeviceAddress", address));
             }
         });
 
         showBluetoothDevices(mListView);
-    }
-
-    private void btConnect(String address){
-        BluetoothDevice device = btAdapter.getRemoteDevice(address);
-        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-        try {
-            BluetoothSocket socket = device.createInsecureRfcommSocketToServiceRecord(uuid);
-            socket.connect();
-
-            String connected = socket.isConnected() ? "true" : "false";
-            Toast.makeText(this, connected, Toast.LENGTH_LONG).show();
-
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
