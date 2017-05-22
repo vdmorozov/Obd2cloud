@@ -47,9 +47,11 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
-        ActionBar actionBar =  getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(R.string.bt_devices);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(R.string.bt_devices);
+        }
 
         mDeviceList = new ArrayList<>();
         mListView = (ListView) findViewById(R.id.pairedView);
@@ -63,11 +65,7 @@ public class BluetoothActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                 String address = mDeviceList.get(position).get("address");
-                //btConnect(address);
-
-                //todo: 2. запустить службу для обмена данными в случае успешного соединения
 
                 startService(new Intent(context, DataSyncService.class).putExtra("btDeviceAddress", address));
             }
@@ -79,7 +77,7 @@ public class BluetoothActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if(item.getItemId() == android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             finish();
             onBackPressed();
             return true;
@@ -155,7 +153,7 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_ENABLE_BT) {
-            if(btAdapter.isEnabled()){
+            if (btAdapter.isEnabled()) {
                 showBluetoothDevices(mListView);
             } else {
                 finish();
@@ -171,7 +169,7 @@ public class BluetoothActivity extends AppCompatActivity {
         // Don't forget to unregister the ACTION_FOUND receiver.
         try {
             unregisterReceiver(mReceiver);
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             //если получатель не был зарегистрирован, ничего не делаем (можно проверять с помощью переменной класса)
         }
     }

@@ -55,6 +55,12 @@ public class DataSyncService extends Service {
         return START_STICKY;
     }
 
+    @Override
+    public void onDestroy(){
+        syncThread.interrupt();
+        stopForeground(true);
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {

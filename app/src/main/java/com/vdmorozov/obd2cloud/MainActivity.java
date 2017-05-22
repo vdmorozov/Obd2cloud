@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity
                 //todo: 2. запустить службу
             } else {
                 //todo: остановить службу
+
+                stopService(new Intent(this, DataSyncService.class));
             }
         }
     }

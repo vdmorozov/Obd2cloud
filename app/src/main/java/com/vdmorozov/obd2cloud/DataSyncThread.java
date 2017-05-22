@@ -21,6 +21,8 @@ public class DataSyncThread extends Thread {
     private BluetoothAdapter btAdapter;
     private BluetoothDevice btDevice;
     private BluetoothSocket btSocket;
+    private OutputStream btOut;
+    private InputStream btIn;
     private Set<Param> availibleParams;
 
     public DataSyncThread(String btDeviceAddress) throws Exception {
@@ -31,45 +33,35 @@ public class DataSyncThread extends Thread {
         btDevice = btAdapter.getRemoteDevice(btDeviceAddress);
     }
 
+    private void init() throws IOException {
+        btSocket = btObdConnect(btDevice);
+        btOut = btSocket.getOutputStream();
+        btIn = btSocket.getInputStream();
+    }
+
+    private void finish() {
+        try {
+            btSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run() {
         try {
-            btSocket = btObdConnect(btDevice);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        //test request
-
-        String cmd = "ATZ";
-        try {
-            OutputStream out = btSocket.getOutputStream();
-            InputStream in = btSocket.getInputStream();
-            out.write((cmd + "\r").getBytes());
-            out.flush();
-
-            byte b = 0;
-            StringBuilder res = new StringBuilder();
-
-            // read until '>' arrives OR end of stream reached
-            char c;
-            // -1 if the end of the stream is reached
-            while (((b = (byte) in.read()) > -1)) {
-                c = (char) b;
-                if (c == '>') // read until '>' arrives
-                {
-                    break;
-                }
-                res.append(c);
+            init();
+            String cmd = "ATZ";
+            while (!Thread.interrupted()) {
+                Log.e("ACHTUNG", btSendCommand(cmd));
+                sleep(400);
             }
-
-            Log.e("ACHTUNG", res.toString());
-
+            finish();
+        } catch (InterruptedException e) {
+            finish();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     private BluetoothSocket btObdConnect(BluetoothDevice btDevice) throws IOException {
@@ -77,10 +69,28 @@ public class DataSyncThread extends Thread {
         BluetoothSocket socket = btDevice.createInsecureRfcommSocketToServiceRecord(uuid);
         socket.connect();
 
-        String connected = socket.isConnected() ? "true" : "false";
-        //btSocket.close();
-
         return socket;
+    }
+
+    private String btSendCommand(String code) throws IOException {
+        btOut.write((code + "\r").getBytes());
+        btOut.flush();
+
+        byte b;
+        StringBuilder res = new StringBuilder();
+
+        // read until '>' arrives OR end of stream reached
+        char c;
+        // -1 if the end of the stream is reached
+        while (((b = (byte) btIn.read()) > -1)) {
+            c = (char) b;
+            if (c == '>') // read until '>' arrives
+            {
+                break;
+            }
+            res.append(c);
+        }
+        return res.toString();
     }
 
     private ParamValue fetchValue(Param param) {
