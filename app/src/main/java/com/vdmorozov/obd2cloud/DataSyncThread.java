@@ -3,10 +3,16 @@ package com.vdmorozov.obd2cloud;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.github.pires.obd.commands.SpeedCommand;
+import com.github.pires.obd.commands.engine.RPMCommand;
+import com.github.pires.obd.commands.protocol.EchoOffCommand;
+import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
+import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
+import com.github.pires.obd.commands.protocol.TimeoutCommand;
+import com.github.pires.obd.enums.ObdProtocols;
+import com.github.pires.obd.exceptions.NoDataException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +23,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public class DataSyncThread extends Thread {
+
+    private static final String TAG = DataSyncThread.class.getSimpleName();
 
     private BluetoothAdapter btAdapter;
     private BluetoothDevice btDevice;
@@ -33,12 +41,6 @@ public class DataSyncThread extends Thread {
         btDevice = btAdapter.getRemoteDevice(btDeviceAddress);
     }
 
-    private void init() throws IOException {
-        btSocket = btObdConnect(btDevice);
-        btOut = btSocket.getOutputStream();
-        btIn = btSocket.getInputStream();
-    }
-
     private void finish() {
         try {
             btSocket.close();
@@ -50,17 +52,35 @@ public class DataSyncThread extends Thread {
     @Override
     public void run() {
         try {
-            init();
-            String cmd = "ATZ";
+            btSocket = btObdConnect(btDevice);
+            btOut = btSocket.getOutputStream();
+            btIn = btSocket.getInputStream();
+
+            new EchoOffCommand().run(btIn, btOut);
+            new LineFeedOffCommand().run(btIn, btOut);
+            new TimeoutCommand(400).run(btIn, btOut);
+            new SelectProtocolCommand(ObdProtocols.AUTO).run(btIn, btOut);
+
+            RPMCommand RpmCommand = new RPMCommand();
+            SpeedCommand speedCommand = new SpeedCommand();
+
             while (!Thread.interrupted()) {
-                Log.e("ACHTUNG", btSendCommand(cmd));
+                RpmCommand.run(btIn, btOut);
+                speedCommand.run(btIn, btOut);
+
+                Log.e(TAG, "RPM: " + RpmCommand.getFormattedResult());
+                Log.e(TAG, "Speed: " + speedCommand.getFormattedResult());
+
                 sleep(400);
             }
             finish();
         } catch (InterruptedException e) {
             finish();
-        } catch (IOException e) {
+        } catch (NoDataException | IOException e) {
+            finish();
             e.printStackTrace();
+
+            //todo: уведомить сервис об ошибке
         }
     }
 
