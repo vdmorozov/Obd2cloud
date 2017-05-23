@@ -26,15 +26,12 @@ public class DataSyncThread extends Thread {
 
     private static final String TAG = DataSyncThread.class.getSimpleName();
 
-    private BluetoothAdapter btAdapter;
     private BluetoothDevice btDevice;
     private BluetoothSocket btSocket;
-    private OutputStream btOut;
-    private InputStream btIn;
     private Set<Param> availibleParams;
 
     public DataSyncThread(String btDeviceAddress) throws Exception {
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null || !btAdapter.isEnabled()) {
             throw new Exception("bluetooth adapter init failure");
         }
@@ -52,18 +49,25 @@ public class DataSyncThread extends Thread {
     @Override
     public void run() {
         try {
-            btSocket = btObdConnect(btDevice);
-            btOut = btSocket.getOutputStream();
-            btIn = btSocket.getInputStream();
+            //obd adapter connection and initialization
+            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+            BluetoothSocket socket = btDevice.createInsecureRfcommSocketToServiceRecord(uuid);
+            socket.connect();
+
+            btSocket = socket;
+            OutputStream btOut = btSocket.getOutputStream();
+            InputStream btIn = btSocket.getInputStream();
 
             new EchoOffCommand().run(btIn, btOut);
             new LineFeedOffCommand().run(btIn, btOut);
             new TimeoutCommand(400).run(btIn, btOut);
             new SelectProtocolCommand(ObdProtocols.AUTO).run(btIn, btOut);
 
+            //preparing commands
             RPMCommand RpmCommand = new RPMCommand();
             SpeedCommand speedCommand = new SpeedCommand();
 
+            //main loop
             while (!Thread.interrupted()) {
                 RpmCommand.run(btIn, btOut);
                 speedCommand.run(btIn, btOut);
@@ -79,38 +83,8 @@ public class DataSyncThread extends Thread {
         } catch (NoDataException | IOException e) {
             finish();
             e.printStackTrace();
-
-            //todo: уведомить сервис об ошибке
+            //todo: уведомить сервис об ошибке (чтобы он остановился)
         }
-    }
-
-    private BluetoothSocket btObdConnect(BluetoothDevice btDevice) throws IOException {
-        UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-        BluetoothSocket socket = btDevice.createInsecureRfcommSocketToServiceRecord(uuid);
-        socket.connect();
-
-        return socket;
-    }
-
-    private String btSendCommand(String code) throws IOException {
-        btOut.write((code + "\r").getBytes());
-        btOut.flush();
-
-        byte b;
-        StringBuilder res = new StringBuilder();
-
-        // read until '>' arrives OR end of stream reached
-        char c;
-        // -1 if the end of the stream is reached
-        while (((b = (byte) btIn.read()) > -1)) {
-            c = (char) b;
-            if (c == '>') // read until '>' arrives
-            {
-                break;
-            }
-            res.append(c);
-        }
-        return res.toString();
     }
 
     private ParamValue fetchValue(Param param) {
