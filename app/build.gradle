@@ -31,6 +31,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:10.2.0'
 
     compile 'com.github.pires:obd-java-api:1.0'
+    compile 'com.jjoe64:graphview:4.2.1'
 
     testCompile 'junit:junit:4.12'
 }

@@ -22,6 +22,9 @@ import android.widget.Switch;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.InputStream;
 
@@ -123,6 +126,17 @@ public class MainActivity extends AppCompatActivity
 
         Switch syncSwitch = (Switch) navigationView.getHeaderView(0).findViewById(R.id.syncSwitch);
         syncSwitch.setOnClickListener(this);
+
+        //графики
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(new DataPoint[]{
+                new DataPoint(0, 1),
+                new DataPoint(1, 5),
+                new DataPoint(2, 3),
+                new DataPoint(3, 2),
+                new DataPoint(4, 6)
+        });
+        graph.addSeries(series);
     }
 
     @Override

@@ -17,9 +17,12 @@
 
     <string name="bt_devices">Bluetooth устройства</string>
     <string name="bt_need_to_enable">Требуется включить Bluetooth</string>
+
     <string name="menu_item_help">Справка</string>
     <string name="menu_item_feedback">Обратная связь</string>
     <string name="menu_section_support">Поддержка</string>
     <string name="menu_item_settings">Настройки</string>
     <string name="menu_item_statistics">Статистика</string>
+
+    <string name="main_summary_title">Сводка</string>
 </resources>
