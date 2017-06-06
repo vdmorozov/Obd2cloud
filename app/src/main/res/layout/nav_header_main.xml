@@ -39,8 +39,9 @@
         android:id="@+id/syncSwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textOn="@string/sync_on"
+        android:paddingTop="@dimen/nav_sync_vertical_spacing"
+        android:text="@string/sync"
         android:textOff="@string/sync_off"
-        android:text="@string/sync" />
+        android:textOn="@string/sync_on" />
 
 </LinearLayout>

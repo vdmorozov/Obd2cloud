@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Obd2cloud</string>
+
+    <string name="sign_in_title">Obd2cloud</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Настройки</string>
+    <string name="profile_image">картинка профиля</string>
+    <string name="profile_default_name">Пользователь</string>
+    <string name="profile_default_mail">username@example.com</string>
+
+    <string name="sync">Синхронизация</string>
+    <string name="sync_on">Синхронизация включена</string>
+    <string name="sync_off">Синхронизация отключена</string>
+
+    <string name="bt_devices">Bluetooth устройства</string>
+    <string name="bt_need_to_enable">Требуется включить Bluetooth</string>
+    <string name="menu_item_help">Справка</string>
+    <string name="menu_item_feedback">Обратная связь</string>
+    <string name="menu_section_support">Поддержка</string>
+    <string name="menu_item_settings">Настройки</string>
+    <string name="menu_item_statistics">Статистика</string>
+</resources>

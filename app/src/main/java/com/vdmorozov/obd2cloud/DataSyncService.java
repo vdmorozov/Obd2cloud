@@ -26,7 +26,7 @@ public class DataSyncService extends Service {
     public void onCreate() {
         super.onCreate();
         Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_menu_camera)
+                .setSmallIcon(R.drawable.ic_notification_sync)
                 .setContentTitle("Obd2cloud sync is working")
                 .setContentText("Touch to stop")
                 .build();
